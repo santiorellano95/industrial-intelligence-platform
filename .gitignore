@@ -1,0 +1,18 @@
+# git init para iniciar git.
+# git status para ver los archivos 
+# git add . para agregar todos los archivos o git add "archivo" para agregar un archivo especifico
+
+# Python
+__pycache__/
+*.pyc
+
+# Entornos virtuales
+.venv/
+venv/
+
+# VS Code
+.vscode/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db

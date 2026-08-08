@@ -1,0 +1,4 @@
+codigo,nombre,tipo,area,fabricante,potencia_kw,estado,horas_funcionamiento,criticidad
+C-A0,Compresor A0,Compresor,Sala de maquinas,Howden,450,Operativo,1250,Alta
+CEV-A,Condensador Evaporativo A,Condensador,Sala de maquinas,Sulzer,0,Operativo,2500,Alta
+CALD-B,Caldera B,Caldera,Usina,Mellor,33000,Fuera de servicio,1750,Alta
