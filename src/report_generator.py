@@ -2,6 +2,7 @@ from datetime import datetime
 
 from src.filtering_engine import filtrar_por_campo
 from src.kpi_engine import contar_por_campo
+from src.kpi_engine import resumen_por_estado
 
 
 def generar_reporte(activos):
@@ -53,10 +54,17 @@ def generar_reporte(activos):
     activos_criticos = filtrar_por_campo(activos, "criticidad", "Alta")
 
     for activo in activos_criticos:
-        print("-" * ANCHO_REPORTE)
+
         print("Codigo:", activo["codigo"])
         print("Nombre:", activo["nombre"])
         print("Estado:", activo["estado"])
+        print("-" * ANCHO_REPORTE)
+
+    print(("RESUMEN POR ESTADO").center(ANCHO_REPORTE, "="))
+    resumen = resumen_por_estado(activos)
+
+    for estado, cantidad in resumen.items():
+        print(estado.ljust(ANCHO_INDEX, "."), cantidad)
 
     fecha_reporte = datetime.now()
 
