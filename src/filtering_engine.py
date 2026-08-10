@@ -7,7 +7,7 @@ def filtrar_por_campo(activos, campo, valor):
 
     for activo in activos:
 
-        if activo[campo] == valor:
+        if activo.get(campo) == valor:
             resultados.append(activo)
 
     return resultados

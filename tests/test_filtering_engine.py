@@ -25,3 +25,16 @@ def test_filtrar_por_campo():
 
     assert len(resultado) == 1
     assert resultado[0]["nombre"] == "Compresor A0"
+
+
+def test_filtrar_por_campo_inexistente():
+    activos = [
+        {
+            "codigo": "C-A0",
+            "nombre": "Compresor A0",
+            "estado": "Operativo",
+        }
+    ]
+
+    resultado = filtrar_por_campo(activos, "presion", 10)
+    assert resultado == []
