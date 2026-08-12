@@ -1,6 +1,6 @@
-from src.data_loader import cargar_activos
+from src.database import obtener_activos
 from src.report_generator import generar_reporte
 
-activos = cargar_activos("data/activos.csv")
+activos = obtener_activos()
 
 generar_reporte(activos)

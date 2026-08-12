@@ -16,3 +16,7 @@ venv/
 # Archivos del sistema
 .DS_Store
 Thumbs.db
+
+# Archivos con informacion importante
+.env
+

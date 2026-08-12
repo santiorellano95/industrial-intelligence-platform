@@ -1,3 +1,5 @@
 # IDE Academy
 
 pytest
+psycopg2-binary
+python-dotenv
