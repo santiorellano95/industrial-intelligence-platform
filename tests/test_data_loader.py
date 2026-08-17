@@ -13,3 +13,5 @@ def test_cargar_archivo_inexistente():
     activos = cargar_activos("data/archivo_que_no_existe.csv")
 
     assert activos == []
+
+
