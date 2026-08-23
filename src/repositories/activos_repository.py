@@ -50,3 +50,25 @@ def obtener_resumen_ot_por_activo():
         ORDER BY cantidad_ot DESC
 """
     return ejecutar_consulta(query)
+
+
+def obtener_backlog_por_activo():
+    query = """
+        SELECT 
+        a.codigo,
+        a.nombre,
+        a.criticidad,
+        COUNT(ot.id) AS backlog
+        FROM activos a
+        LEFT JOIN ordenes_trabajo ot
+        ON a.id = ot.activo_id
+        AND ot.estado = 'Abierta'
+        GROUP BY a.id, a.codigo, a.nombre
+        ORDER BY backlog DESC
+        
+"""
+    return ejecutar_consulta(query)
+
+
+if __name__ == "__main__":
+    print(obtener_resumen_ot_por_activo())
