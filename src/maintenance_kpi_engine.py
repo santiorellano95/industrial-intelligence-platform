@@ -1,3 +1,6 @@
+from datetime import date, timedelta
+
+
 def contar_ordenes(ordenes):
     return len(ordenes)
 
@@ -91,25 +94,105 @@ def ranking_prioridad_backlog(activos):
     return ranking
 
 
+def tasa_backlog_vencido(ordenes):
+    abiertas = calcular_backlog(ordenes)
+    vencidas = 0
+    hoy = date.today()
+
+    if abiertas == 0:
+        return 0
+
+    for orden in ordenes:
+
+        if orden["estado"] != "Abierta":
+            continue
+
+        if orden["fecha_programada"] is None:
+            continue
+
+        if (orden["fecha_programada"]) < hoy:
+            vencidas += 1
+
+    tasa = (vencidas / abiertas) * 100
+
+    return tasa
+
+
+def aging_backlog(ordenes):
+    hoy = date.today()
+
+    backlog_menor_siete = 0
+    backlog_menor_treinta = 0
+    backlog_menor_sesenta = 0
+    backlog_mayor_sesenta = 0
+
+    for orden in ordenes:
+
+        if orden["estado"] != "Abierta":
+            continue
+
+        if orden["fecha_apertura"] is None:
+            continue
+
+        dias_abierta = (hoy - orden["fecha_apertura"]).days
+
+        if dias_abierta <= 7:
+            backlog_menor_siete += 1
+
+        elif dias_abierta <= 30:
+            backlog_menor_treinta += 1
+
+        elif dias_abierta <= 60:
+            backlog_menor_sesenta += 1
+
+        else:
+            backlog_mayor_sesenta += 1
+
+    return {
+        "0-7": backlog_menor_siete,
+        "8-30": backlog_menor_treinta,
+        "31-60": backlog_menor_sesenta,
+        ">60": backlog_mayor_sesenta,
+    }
+
+
+
+
+
 if __name__ == "__main__":
+    hoy = date.today()
     activos = [
         {
-            "codigo": "C-A0",
+            "numero_ot": "OT-002",
             "nombre": "Compresor A0",
+            "estado": "Abierta",
             "criticidad": "Alta",
-            "backlog": 1,
+            "prioridad": "Alta",
+            "fecha_programada": None,
         },
         {
-            "codigo": "TEST-01",
-            "nombre": "Bomba auxiliar",
-            "criticidad": "Media",
-            "backlog": 2,
-        },
-        {
-            "codigo": "Cald-B",
+            "numero_ot": "OT-003",
             "nombre": "Caldera B",
+            "estado": "Abierta",
             "criticidad": "Alta",
-            "backlog": 2,
+            "prioridad": "Alta",
+            "fecha_programada": hoy + timedelta(days=5),
+        },
+        {
+            "numero_ot": "OT-004",
+            "nombre": "Caldera B",
+            "estado": "Abierta",
+            "criticidad": "Alta",
+            "prioridad": "Alta",
+            "fecha_programada": hoy - timedelta(days=7),
+        },
+        {
+            "numero_ot": "OT-005",
+            "nombre": "Condensador evaporativo",
+            "estado": "Abierta",
+            "criticidad": "Alta",
+            "prioridad": "Alta",
+            "fecha_programada": hoy - timedelta(days=7),
         },
     ]
-    print(ranking_prioridad_backlog(activos))
+    print(tasa_backlog_vencido(activos))

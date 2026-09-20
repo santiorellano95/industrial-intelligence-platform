@@ -1,5 +1,7 @@
 import pytest
 
+from datetime import date, timedelta
+
 from src.maintenance_kpi_engine import (
     calcular_backlog,
     contar_por_estado,
@@ -9,6 +11,8 @@ from src.maintenance_kpi_engine import (
     porcentaje_por_tipo,
     calcular_prioridad_backlog,
     ranking_prioridad_backlog,
+    tasa_backlog_vencido,
+    aging_backlog,
 )
 
 
@@ -194,4 +198,109 @@ def test_ranking_prioridad_backlog():
 def test_ranking_prioridad_backlog_sin_activos():
     ranking = ranking_prioridad_backlog([])
 
-    assert ranking == []    
+    assert ranking == []
+
+
+def test_tasa_backlog_vencido():
+    hoy = date.today()
+    activos = [
+        {
+            "numero_ot": "OT-002",
+            "nombre": "Compresor A0",
+            "estado": "Cerrada",
+            "criticidad": "Alta",
+            "prioridad": "Alta",
+            "fecha_programada": hoy - timedelta(days=7),
+        },
+        {
+            "numero_ot": "OT-003",
+            "nombre": "Caldera B",
+            "estado": "Abierta",
+            "criticidad": "Alta",
+            "prioridad": "Alta",
+            "fecha_programada": hoy + timedelta(days=5),
+        },
+        {
+            "numero_ot": "OT-004",
+            "nombre": "Caldera B",
+            "estado": "Abierta",
+            "criticidad": "Alta",
+            "prioridad": "Alta",
+            "fecha_programada": hoy - timedelta(days=7),
+        },
+        {
+            "numero_ot": "OT-005",
+            "nombre": "Condensador evaporativo",
+            "estado": "Abierta",
+            "criticidad": "Alta",
+            "prioridad": "Alta",
+            "fecha_programada": hoy - timedelta(days=7),
+        },
+    ]
+    tasa = tasa_backlog_vencido(activos)
+
+    assert tasa == pytest.approx(66.66, rel=0.1)
+
+
+def test_tasa_backlog_vencido_ot_cerradas():
+    hoy = date.today()
+    activos = [
+        {
+            "numero_ot": "OT-002",
+            "nombre": "Compresor A0",
+            "estado": "Cerrada",
+            "criticidad": "Alta",
+            "prioridad": "Alta",
+            "fecha_programada": hoy - timedelta(days=7),
+        }
+    ]
+    tasa = tasa_backlog_vencido(activos)
+
+    assert tasa == 0
+
+
+def test_tasa_backlog_vencido_no_programado():
+    hoy = date.today()
+    activos = [
+        {
+            "numero_ot": "OT-002",
+            "nombre": "Compresor A0",
+            "estado": "Cerrada",
+            "criticidad": "Alta",
+            "prioridad": "Alta",
+            "fecha_programada": None,
+        }
+    ]
+    tasa = tasa_backlog_vencido(activos)
+
+    assert tasa == 0
+
+
+def test_aging_backlog():
+    hoy = date.today()
+    ordenes = [
+        {"estado": "Abierta", "fecha_apertura": hoy - timedelta(days=5)},
+        {"estado": "Abierta", "fecha_apertura": hoy - timedelta(days=15)},
+        {"estado": "Abierta", "fecha_apertura": hoy - timedelta(days=45)},
+        {"estado": "Abierta", "fecha_apertura": hoy - timedelta(days=90)},
+    ]
+
+    resultado = aging_backlog(ordenes)
+
+    assert resultado == {
+        "0-7": 1,
+        "8-30": 1,
+        "31-60": 1,
+        ">60": 1,
+    }
+
+
+def test_aging_backlog_sin_ordenes():
+    resultados = aging_backlog([])
+
+    assert resultados == {
+        "0-7": 0,
+        "8-30": 0,
+        "31-60": 0,
+        ">60": 0,
+    }

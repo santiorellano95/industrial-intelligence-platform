@@ -5,10 +5,14 @@ from src.maintenance_kpi_engine import (
     porcentaje_cerradas,
     porcentaje_por_tipo,
     ranking_prioridad_backlog,
+    tasa_backlog_vencido,
+    aging_backlog,
 )
 
 from src.repositories.ordenes_repository import (
     obtener_ordenes_trabajo,
+    obtener_antiguedad_backlog,
+    obtener_backlog_vencido,
 )
 from src.repositories.activos_repository import (
     obtener_backlog_por_activo,
@@ -22,6 +26,10 @@ def generar_reporte_mantenimiento():
     ordenes = obtener_ordenes_trabajo()
 
     backlog_por_activo = obtener_backlog_por_activo()
+
+    antiguedad_backlog = obtener_antiguedad_backlog()
+
+    backlog_vencido = obtener_backlog_vencido()
 
     porcentaje_tipo = porcentaje_por_tipo(ordenes)
 
@@ -61,6 +69,45 @@ def generar_reporte_mantenimiento():
             (activo["criticidad"]).ljust(12, "."),
             (activo["backlog"]),
         )
+
+    print("\nANTIGUEDAD DEL BACKLOG")
+    print(("-" * ANCHO_REPORTE))
+    for backlog in antiguedad_backlog:
+        print(
+            (backlog["numero_ot"]).ljust(9),
+            "|",
+            (backlog["nombre"]).ljust(15),
+            "|",
+            (backlog["prioridad"]).ljust(9),
+            "|",
+            (backlog["dias_abierta"]),
+        )
+
+    print("\nBACKLOG VENCIDO")
+    print(("-" * ANCHO_REPORTE))
+    for backlog in backlog_vencido:
+        print(
+            (backlog["numero_ot"]).ljust(9),
+            "|",
+            (backlog["nombre"]).ljust(15),
+            "|",
+            (backlog["prioridad"]).ljust(9),
+            "|",
+            (backlog["dias_vencida"]),
+        )
+
+    print("\nESTADO DEL BACKLOG")
+    print("-" * ANCHO_REPORTE)
+    tasa = tasa_backlog_vencido(ordenes)
+    print(("Backlog").ljust(ANCHO_INDEX, "."), calcular_backlog(ordenes))
+    print(("Backlog vencido").ljust(ANCHO_INDEX, "."), len(backlog_vencido))
+    print(("Tasa de backlog vencido").ljust(ANCHO_INDEX, "."), tasa)
+
+    print("\nAGING DEL BACKLOG")
+    print("=" * ANCHO_REPORTE)
+    aging = aging_backlog(ordenes)
+    for rango, cantidad in aging.items():
+        print((f"{rango} dias").ljust(ANCHO_INDEX, "."), cantidad)
 
     print("=" * ANCHO_REPORTE)
 
