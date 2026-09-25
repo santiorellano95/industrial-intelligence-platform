@@ -79,13 +79,13 @@ def test_obtener_backlog_por_activo():
             "codigo": "C-A0",
             "nombre": "Compresor A0",
             "criticidad": "Alta",
-            "backlog": 1,
+            "ot_abiertas": 1,
         },
         {
             "codigo": "CEV-A",
             "nombre": "Condensador evaporativo A",
             "criticidad": "Alta",
-            "backlog": 0,
+            "ot_abiertas": 0,
         },
     ]
 
