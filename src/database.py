@@ -20,20 +20,37 @@ def conectar():
     return conexion
 
 
-def ejecutar_consulta(query):
+def ejecutar_consulta(query, parametros=None):
     conexion = conectar()
     cursor = conexion.cursor(cursor_factory=RealDictCursor)
 
     try:
-        cursor.execute(query)
-        resultado = cursor.fetchall()
-        return resultado
+        # 1. Ejecutar la consulta
+        if parametros is None:
+            cursor.execute(query)
+        else:
+            cursor.execute(query, parametros)
+
+        # 2. Si la consulta devuelve filas (por ejemplo SELECT)
+        if cursor.description is not None:
+            resultado = cursor.fetchall()
+            return resultado
+
+        # 3. Si no devuelve filas, asumimos que modificó la BD
+        # INSERT, UPDATE o DELETE
+        conexion.commit()
+        return None
 
     except psycopg2.Error as error:
-        print("Error ejecutando la consulta PostrgreSQL:")
+        # 4. Si algo falla, deshacemos la transacción
+        conexion.rollback()
+
+        print("Error ejecutando la consulta PostgreSQL:")
         print(error)
+
         raise
 
     finally:
+        # 5. Esto ocurre siempre
         cursor.close()
         conexion.close()
